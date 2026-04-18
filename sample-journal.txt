@@ -1,0 +1,149 @@
+October 3, 2025
+
+Started the new role at Meridian Tech three weeks ago and I'm already questioning if this was the right move. The work itself is interesting — building out their data platform — but my tech lead, Marcus, is making everything harder than it needs to be. He shot down my proposal for migrating to event-driven architecture in front of the entire team today. Didn't even let me finish presenting. Just said "we tried something like that two years ago and it didn't work" and moved on. I spent three weeks on that proposal. Came home and vented to Sophie about it. She told me to give it time, that new jobs always feel rough at the start. She's probably right but it still stings.
+
+Jake made pasta tonight. The guy can barely boil water but he's been watching YouTube cooking videos and honestly it wasn't bad. We sat on the balcony after dinner and talked about his startup idea again — something about AI-powered resume screening. I told him the market is crowded but he's got that look in his eyes. He's going to do it regardless of what anyone says. That's what I like about living with him. His energy is contagious.
+
+---
+
+October 11, 2025
+
+Mom called today. She's worried about Dad's blood pressure again. He refuses to cut back on salt and she's exhausted from arguing with him about it. I told her I'd call him this weekend and try talking to him. She also asked when I'm bringing Sophie home for dinner. I keep dodging that question. It's not that I don't want them to meet her — I do. I just know Mom is going to start asking about marriage within five minutes and Sophie and I have only been together eight months. We're not there yet.
+
+Lily texted me a photo of her new apartment in Vancouver. She's so proud of it — tiny studio but it's hers. My little sister living across the country still feels weird. She asked if I could help her set up her home network next time I visit. Classic Lily — moves 4,000 km away but still needs her brother for tech support.
+
+---
+
+October 19, 2025
+
+Another brutal week at work. Marcus assigned me to refactor the legacy billing module — the one everyone else has been avoiding for two years. I'm pretty sure it's a test, or maybe punishment for the architecture proposal. Either way, the code is a nightmare. No tests, no documentation, dependencies on three deprecated libraries. I've been staying late every day trying to make sense of it.
+
+Ethan called from Montreal. Haven't talked to my brother in almost a month, which is unusual for us. He's been busy with his residency — emergency medicine is no joke. He sounded tired but happy. He asked about the new job and I downplayed the Marcus situation. Ethan has a way of wanting to fix things and I just needed to vent, not get advice. Maybe I should've called Sophie instead but she was at her book club.
+
+---
+
+October 28, 2025
+
+Small win at work today. I found a critical bug in the billing module that's been silently overcharging enterprise clients for months. Flagged it to Marcus with a detailed write-up and a fix. He didn't say much — just "good catch" in the team Slack — but I noticed he CC'd the engineering director on the bug report. Maybe he's not entirely impossible.
+
+Sophie and I went to that new Thai place on Queen Street. She's been stressed about her thesis defense coming up in December. She's studying computational linguistics at U of T and her advisor keeps moving the goalposts. I don't fully understand her research but I love listening to her talk about it. Her eyes light up when she explains how language models process ambiguity. We've been together since February and I still learn something new about her every week.
+
+---
+
+November 8, 2025
+
+Dad finally agreed to see the cardiologist. Mom practically had to drag him there but at least he went. Results were okay — blood pressure is elevated but manageable with medication. He's grumpy about the dietary restrictions. I told him I'd send him some low-sodium recipes. He laughed and said "since when do you cook?" Fair point, Dad.
+
+Jake got his first angel investor meeting for the startup. He's been pacing around the apartment rehearsing his pitch for days. I helped him tighten the financial projections last night. His revenue model had some holes but the core idea is solid. He's calling it "ResumeAI" which I think is too generic but he loves it. The meeting is next Thursday. I'm nervous for him honestly.
+
+---
+
+November 17, 2025
+
+Something shifted with Marcus this week. He pulled me into a one-on-one and actually asked for my opinion on the Q1 roadmap. Listened without interrupting. Then he said something that caught me off guard — "I was hard on you about the architecture proposal because the last person who pitched something similar didn't think through the migration path. But your billing module work showed me you understand the codebase. Let's revisit your proposal in January." I almost fell out of my chair. Maybe he's been testing me this whole time.
+
+Jake's investor meeting didn't go well. They passed. He was quiet all evening which is very unlike him — Jake is usually the loudest person in any room. I ordered us pizza and we watched old Office episodes without talking much. Sometimes that's what you need.
+
+---
+
+November 29, 2025
+
+Thanksgiving weekend. Drove home to see the family. Dad looks thinner which worries me but Mom says the medication is working. She made enough food for twenty people as usual. Ethan couldn't make it — he was on call at the hospital. We FaceTimed him during dessert and he looked exhausted but joked about stealing leftover turkey.
+
+Lily flew in from Vancouver which was a surprise. She's doing well — got promoted to senior designer at her agency. She and Mom spent the whole weekend in the kitchen together, which was sweet. Lily told me privately that she's been feeling lonely in Vancouver. No close friends yet, just work acquaintances. I told her to give it time. Same advice Sophie gave me about my job. Funny how that goes.
+
+Sophie couldn't come — her parents were visiting from Hamilton and she needed to be with them. I understand but I was hoping this would be the trip where my family meets her. Maybe Christmas.
+
+---
+
+December 9, 2025
+
+Marcus and I presented the Q1 architecture roadmap together to the engineering leadership team today. Together. Three months ago this man wouldn't let me finish a sentence in a team meeting and now we're co-presenting to the VP of Engineering. The proposal includes a phased migration to event-driven architecture — basically my original idea but with the migration path he wanted. It got approved. I'm leading the implementation starting January.
+
+I called Ethan after to celebrate and he said "told you to give it time." He did not tell me that but sure, big brother, take the credit.
+
+---
+
+December 18, 2025
+
+Sophie defended her thesis today. She crushed it. Her committee was impressed and she passed with minor revisions. We went out for drinks after with her lab mates. She was glowing. I'm so proud of her. She's been working toward this for four years and watching her talk about her research with that confidence — I could've listened all night.
+
+Jake got a second investor meeting, different firm. He's been more cautious this time, really refining the pitch. He asked me to do a mock presentation last weekend and I grilled him harder than any investor would. He thanked me after which means I probably wasn't hard enough.
+
+---
+
+January 5, 2026
+
+New year, new project. The architecture migration kicked off today and I've got a team of four. Marcus is hands-off but available — a good balance. He told me privately that he's recommending me for senior engineer at the next review cycle. Six months ago I wanted to quit. Wild how things change.
+
+Jake dropped a bomb at dinner. He's moving out at the end of February. The second investor came through — they're funding ResumeAI and he's relocating to their incubator space in Toronto's east end. He wants to live closer to the office. I'm happy for him, genuinely, but the apartment is going to feel empty. We've been roommates for three years. He's not just a roommate at this point — he's family. I told him congratulations and then went to my room and felt weirdly emotional about it. Change is hard even when it's good.
+
+---
+
+January 14, 2026
+
+Apartment hunting for a new roommate or deciding if I can swing the rent solo. The place is a two-bedroom in Liberty Village and it's not cheap. Sophie suggested I move in with her but we both agreed it's too soon. We've been together almost a year. I love her but I also know that moving in together to save money is different from moving in together because you're ready. She respected that, which made me love her more.
+
+Lily called crying. Her best friend from university, the only person she was close to in Vancouver, is moving to Australia. She's devastated. I booked a flight to visit her next month. Sometimes you just need your brother to show up.
+
+---
+
+January 26, 2026
+
+Work is going well. The migration is on track — we've converted two microservices to the event-driven pattern and the performance improvements are already measurable. Marcus brought donuts to the team standup which apparently is his version of "I'm proud of you." The team is clicking. I'm starting to feel like I actually belong at Meridian.
+
+Had dinner with Mom and Dad last weekend. Dad's being better about the diet, mostly because Mom started cooking differently without telling him. He thinks he's still eating the same food. Genius move, Mom. He seems healthier. More energy. He even suggested we go for a walk after dinner which hasn't happened in years.
+
+---
+
+February 8, 2026
+
+Visited Lily in Vancouver. Her apartment is cute but small, and she had that look — the one she gets when she's trying to seem fine but isn't. We spent three days just hanging out. Walked the seawall, ate too much sushi, watched movies at night. On the last evening she told me she's been thinking about moving back to Toronto. Not running away from Vancouver, she said, but running toward the people she loves. I told her I'd support whatever she decides. But selfishly I hope she comes back.
+
+Jake started packing. Seeing boxes in the living room hits different. Three years of late-night conversations, terrible cooking experiments, board game marathons, and now boxes. He said we'll still hang out all the time. I know we will at first. Then life gets busy. I've seen it happen with other friends. I'm trying not to be cynical about it.
+
+---
+
+February 20, 2026
+
+Sophie met my parents. Finally. We drove to their place for Sunday lunch and it went better than I expected. Mom loved her immediately — they bonded over their shared obsession with crime documentaries. Dad was quieter but he pulled me aside later and said "she's sharp, I like her." From Dad, that's basically a marriage blessing. Sophie was nervous on the drive there but completely herself by dessert. That's what I love about her — she doesn't perform for people.
+
+Ethan FaceTimed in during lunch and immediately started interrogating Sophie about her research. She handled it like a champ. He texted me after: "She's way too good for you." Thanks, Ethan.
+
+---
+
+March 1, 2026
+
+Jake moved out today. Helped him load the van. His new place is a loft near the Distillery District — way nicer than our place honestly. Good for him. The apartment feels too quiet now. I keep expecting to hear him talking loudly on the phone or burning something in the kitchen. I put on a podcast just to have noise.
+
+Sophie came over after work with wine and takeout. She didn't try to cheer me up or minimize it. Just sat with me. That's the thing about her — she knows when to talk and when to just be there.
+
+---
+
+March 10, 2026
+
+Marcus told me today that my senior engineer promotion went through. Effective April 1st. Fourteen months from "this was a mistake" to senior engineer. The raise is significant and the title matters for where I want to go next. I took the team out for lunch to celebrate. Marcus came too. We actually laughed together. If you'd told me in October this man would become someone I genuinely respect, I would've called you delusional.
+
+Called Jake to tell him the news. He screamed so loud I had to pull the phone away from my ear. His startup is doing well — they've onboarded their first three enterprise clients. We're both growing. Just in different apartments now.
+
+Found a new roommate through a friend of a friend. His name is Darren, quiet guy, works in finance. Seems responsible. He's not Jake but the rent is covered and he doesn't seem like the type to burn pasta.
+
+---
+
+March 22, 2026
+
+Lily decided to move back to Toronto. She gave notice at her agency and they offered her remote work which is perfect. She's coming back in May. Mom cried on the phone. Dad pretended he wasn't emotional but his voice cracked. Even Ethan — stoic, unshakable Ethan — sent a group text that said "family's getting back together" with about fifteen heart emojis, which might be more emojis than he's used in his entire life.
+
+Sophie and I had our first real fight this week. About something stupid — I forgot we had plans and scheduled a work dinner instead. She wasn't mad about the dinner, she was mad that I didn't remember. She's right. I've been so focused on the promotion and the migration project that I've been on autopilot with everything else. We talked it through. I'm going to be more intentional. She deserves that.
+
+---
+
+April 2, 2026
+
+Senior engineer, officially. New badge, new responsibilities, same desk. Marcus asked me to mentor the two junior developers who just joined. Full circle — someone believed in me when I was struggling, now I get to do that for someone else. One of them, Claire, reminds me of myself in October. Talented but unsure. I'm going to make sure she knows her ideas matter, even the ones that need work.
+
+Darren is fine as a roommate. Clean, quiet, pays rent on time. But sometimes I miss the chaos. Jake came over last weekend and it was like he never left — loud, messy, opinion about everything. Then he left and it was quiet again.
+
+Life is good right now. Not perfect — I miss my friend across the hall, my sister is still 4,000 km away for two more months, and I need to be a better partner. But the job I almost quit became the job that promoted me. The tech lead I resented became a mentor. My sister is coming home. My girlfriend met my family and they love her. Dad is healthier. Ethan is surviving residency. Jake is building something real.
+
+Six months ago I sat in this apartment and wondered if I'd made a mistake moving to this city, taking this job, starting over. I didn't. I just needed time.
