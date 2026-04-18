@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatAnthropic } from '@langchain/anthropic';
-import { ChatOpenAI } from '@langchain/openai';
+import { ChatGroq } from '@langchain/groq';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { HumanMessage, AIMessage, BaseMessage } from '@langchain/core/messages';
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
@@ -28,13 +28,13 @@ export class StreamService {
   private readonly model: BaseChatModel;
 
   constructor(private readonly config: ConfigService) {
-    const provider = this.config.get<string>('LLM_PROVIDER', 'anthropic');
+    const provider = this.config.get<string>('LLM_PROVIDER', 'groq');
     const modelId = this.config.getOrThrow<string>('LLM_MODEL');
 
-    if (provider === 'openai') {
-      this.model = new ChatOpenAI({
+    if (provider === 'groq') {
+      this.model = new ChatGroq({
         model: modelId,
-        apiKey: this.config.getOrThrow<string>('OPENAI_API_KEY'),
+        apiKey: this.config.getOrThrow<string>('GROQ_API_KEY'),
         streaming: true,
       });
     } else {
@@ -60,7 +60,6 @@ export class StreamService {
     ]);
 
     const history = this.buildHistory(conversationHistory);
-
     const chain = prompt.pipe(this.model);
 
     const stream = await chain.stream({
@@ -77,9 +76,7 @@ export class StreamService {
 
   private buildHistory(messages: Message[]): BaseMessage[] {
     return messages.map((msg) =>
-      msg.role === 'user'
-        ? new HumanMessage(msg.content)
-        : new AIMessage(msg.content),
+      msg.role === 'user' ? new HumanMessage(msg.content) : new AIMessage(msg.content),
     );
   }
 }

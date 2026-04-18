@@ -1,42 +1,48 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from './database.types';
+import { Pool, PoolClient } from 'pg';
 
 @Injectable()
-export class DatabaseService implements OnModuleInit {
+export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
-  private client!: SupabaseClient<Database>;
+  private pool!: Pool;
 
   constructor(private readonly config: ConfigService) {}
 
   onModuleInit(): void {
-    const url = this.config.getOrThrow<string>('SUPABASE_URL');
-    const key = this.config.getOrThrow<string>('SUPABASE_SERVICE_ROLE_KEY');
-
-    this.client = createClient<Database>(url, key, {
-      auth: { persistSession: false },
+    this.pool = new Pool({
+      connectionString: this.config.getOrThrow<string>('DATABASE_URL'),
     });
 
-    this.logger.log('Supabase client initialized');
+    this.pool.on('error', (err: Error) => {
+      this.logger.error('Unexpected Postgres pool error', err.message);
+    });
+
+    this.logger.log('PostgreSQL pool initialized');
   }
 
-  get db(): SupabaseClient<Database> {
-    return this.client;
+  async onModuleDestroy(): Promise<void> {
+    await this.pool.end();
+    this.logger.log('PostgreSQL pool closed');
   }
 
-  withUser(userId: string): SupabaseClient<Database> {
-    return createClient<Database>(
-      this.config.getOrThrow<string>('SUPABASE_URL'),
-      this.config.getOrThrow<string>('SUPABASE_SERVICE_ROLE_KEY'),
-      {
-        auth: { persistSession: false },
-        global: {
-          headers: {
-            'x-user-id': userId,
-          },
-        },
-      },
-    );
+  async query<T extends Record<string, unknown>>(
+    sql: string,
+    params: unknown[] = [],
+  ): Promise<T[]> {
+    const result = await this.pool.query<T>(sql, params);
+    return result.rows;
+  }
+
+  async queryOne<T extends Record<string, unknown>>(
+    sql: string,
+    params: unknown[] = [],
+  ): Promise<T | null> {
+    const rows = await this.query<T>(sql, params);
+    return rows[0] ?? null;
+  }
+
+  async getClient(): Promise<PoolClient> {
+    return this.pool.connect();
   }
 }

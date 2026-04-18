@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import type { Database, Json } from '../database/database.types';
+import type { Database } from '../database/database.types';
 
 type Conversation = Database['public']['Tables']['conversations']['Row'];
 type Message = Database['public']['Tables']['conversation_messages']['Row'];
@@ -12,37 +12,30 @@ export class ConversationsService {
   constructor(private readonly db: DatabaseService) {}
 
   async create(userId: string, title?: string): Promise<Conversation> {
-    const { data, error } = await this.db.db
-      .from('conversations')
-      .insert({ user_id: userId, title: title ?? null })
-      .select()
-      .single();
-
-    if (error) throw new Error(`Failed to create conversation: ${error.message}`);
-    return data;
+    const row = await this.db.queryOne<Conversation>(
+      `INSERT INTO conversations (user_id, title)
+       VALUES ($1, $2)
+       RETURNING *`,
+      [userId, title ?? null],
+    );
+    if (!row) throw new Error('Failed to create conversation');
+    return row;
   }
 
   async findOne(conversationId: string, userId: string): Promise<Conversation> {
-    const { data, error } = await this.db.db
-      .from('conversations')
-      .select()
-      .eq('id', conversationId)
-      .eq('user_id', userId)
-      .single();
-
-    if (error || !data) throw new NotFoundException(`Conversation ${conversationId} not found`);
-    return data;
+    const row = await this.db.queryOne<Conversation>(
+      `SELECT * FROM conversations WHERE id = $1 AND user_id = $2`,
+      [conversationId, userId],
+    );
+    if (!row) throw new NotFoundException(`Conversation ${conversationId} not found`);
+    return row;
   }
 
   async findAll(userId: string): Promise<Conversation[]> {
-    const { data, error } = await this.db.db
-      .from('conversations')
-      .select()
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw new Error(`Failed to fetch conversations: ${error.message}`);
-    return data ?? [];
+    return this.db.query<Conversation>(
+      `SELECT * FROM conversations WHERE user_id = $1 ORDER BY created_at DESC`,
+      [userId],
+    );
   }
 
   async saveMessage(
@@ -50,29 +43,29 @@ export class ConversationsService {
     userId: string,
     role: 'user' | 'assistant',
     content: string,
-    metadata: Json = {},
+    metadata: Record<string, unknown> = {},
   ): Promise<Message> {
-    const { data, error } = await this.db.db
-      .from('conversation_messages')
-      .insert({ conversation_id: conversationId, user_id: userId, role, content, metadata })
-      .select()
-      .single();
-
-    if (error) throw new Error(`Failed to save message: ${error.message}`);
-
-    this.logger.debug(`Saved ${role} message ${data.id} in conversation ${conversationId}`);
-    return data;
+    const row = await this.db.queryOne<Message>(
+      `INSERT INTO conversation_messages (conversation_id, user_id, role, content, metadata)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [conversationId, userId, role, content, JSON.stringify(metadata)],
+    );
+    if (!row) throw new Error('Failed to save message');
+    this.logger.debug(`Saved ${role} message ${row.id} in conversation ${conversationId}`);
+    return row;
   }
 
   async getRecentMessages(conversationId: string, limit = 10): Promise<Message[]> {
-    const { data, error } = await this.db.db
-      .from('conversation_messages')
-      .select()
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (error) throw new Error(`Failed to fetch messages: ${error.message}`);
-    return (data ?? []).reverse();
+    return this.db.query<Message>(
+      `SELECT * FROM (
+         SELECT * FROM conversation_messages
+         WHERE conversation_id = $1
+         ORDER BY created_at DESC
+         LIMIT $2
+       ) sub
+       ORDER BY created_at ASC`,
+      [conversationId, limit],
+    );
   }
 }
