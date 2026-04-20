@@ -6,6 +6,7 @@ import { validateConfig } from './config/config.validation';
 import { DatabaseModule } from './database/database.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { ChatModule } from './chat/chat.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChatModule } from './chat/chat.module';
     DatabaseModule,
     ConversationsModule,
     ChatModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

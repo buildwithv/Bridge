@@ -1,9 +1,10 @@
-import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, Optional, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -12,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { ConversationsService } from '../conversations/conversations.service';
 import { StreamService } from './stream.service';
 import { SendMessageDto } from '../conversations/dto/send-message.dto';
+import { UploadController } from '../upload/upload.controller';
 
 interface AuthenticatedSocket extends Socket {
   userId: string;
@@ -22,7 +24,9 @@ interface AuthenticatedSocket extends Socket {
   namespace: '/',
 })
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   readonly server!: Server;
 
@@ -31,7 +35,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly conversationsService: ConversationsService,
     private readonly streamService: StreamService,
+    @Optional() private readonly uploadController: UploadController,
   ) {}
+
+  afterInit(server: Server): void {
+    if (this.uploadController) {
+      this.uploadController.socketServer = server;
+    }
+    this.logger.log('WebSocket gateway initialized');
+  }
 
   handleConnection(client: Socket): void {
     const userId = client.handshake.query['userId'];
@@ -43,6 +55,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     (client as AuthenticatedSocket).userId = userId;
+    // Join a room named after userId so uploads can target the right client
+    void client.join(userId);
     this.logger.log(`Client connected: ${client.id} userId=${userId}`);
   }
 
@@ -59,10 +73,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userId = client.userId;
 
     try {
-      // Verify conversation belongs to user
       await this.conversationsService.findOne(conversationId, userId);
 
-      // Persist user message
       const userMessage = await this.conversationsService.saveMessage(
         conversationId,
         userId,
@@ -70,11 +82,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content,
       );
 
-      // Fetch recent history for context (last 10 messages, excluding the one just saved)
       const history = await this.conversationsService.getRecentMessages(conversationId, 11);
       const historyWithoutLatest = history.filter((m) => m.id !== userMessage.id);
 
-      // Stream AI response token by token
       let fullResponse = '';
 
       for await (const chunk of this.streamService.streamResponse(
@@ -86,7 +96,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.emit('chat:chunk', { requestId, chunk });
       }
 
-      // Persist assistant response
       const assistantMessage = await this.conversationsService.saveMessage(
         conversationId,
         userId,
