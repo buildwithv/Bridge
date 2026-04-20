@@ -44,11 +44,27 @@ class EnvironmentVariables {
   ANTHROPIC_API_KEY?: string;
 
   @IsString()
+  @IsOptional()
+  OPENAI_API_KEY?: string;
+
+  @IsString()
+  @IsOptional()
+  EMBEDDING_PROVIDER: string = 'ollama';
+
+  @IsString()
   EMBEDDING_MODEL!: string;
 
   @IsNumber()
   @IsOptional()
-  EMBEDDING_DIMENSIONS: number = 1536;
+  EMBEDDING_DIMENSIONS: number = 768;
+
+  @IsString()
+  @IsOptional()
+  OLLAMA_BASE_URL: string = 'http://localhost:11434';
+
+  @IsString()
+  @IsOptional()
+  COHERE_API_KEY?: string;
 
   @IsString()
   @IsOptional()
