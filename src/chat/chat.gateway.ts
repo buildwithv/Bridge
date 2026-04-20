@@ -14,6 +14,8 @@ import { ConversationsService } from '../conversations/conversations.service';
 import { StreamService } from './stream.service';
 import { SendMessageDto } from '../conversations/dto/send-message.dto';
 import { UploadController } from '../upload/upload.controller';
+import { ContextAssemblyService } from '../memory/context-assembly.service';
+import { EmbeddingService } from '../memory/embedding.service';
 
 interface AuthenticatedSocket extends Socket {
   userId: string;
@@ -35,6 +37,8 @@ export class ChatGateway
   constructor(
     private readonly conversationsService: ConversationsService,
     private readonly streamService: StreamService,
+    private readonly contextAssembly: ContextAssemblyService,
+    private readonly embeddingService: EmbeddingService,
     @Optional() private readonly uploadController: UploadController,
   ) {}
 
@@ -55,7 +59,6 @@ export class ChatGateway
     }
 
     (client as AuthenticatedSocket).userId = userId;
-    // Join a room named after userId so uploads can target the right client
     void client.join(userId);
     this.logger.log(`Client connected: ${client.id} userId=${userId}`);
   }
@@ -82,7 +85,12 @@ export class ChatGateway
         content,
       );
 
-      const history = await this.conversationsService.getRecentMessages(conversationId, 11);
+      // Run embedding + context assembly in parallel with history fetch
+      const [history, memoryContext] = await Promise.all([
+        this.conversationsService.getRecentMessages(conversationId, 11),
+        this.contextAssembly.assembleContext(userId, content),
+      ]);
+
       const historyWithoutLatest = history.filter((m) => m.id !== userMessage.id);
 
       let fullResponse = '';
@@ -90,7 +98,7 @@ export class ChatGateway
       for await (const chunk of this.streamService.streamResponse(
         content,
         historyWithoutLatest,
-        '', // memory context injected in Phase 4
+        memoryContext,
       )) {
         fullResponse += chunk;
         client.emit('chat:chunk', { requestId, chunk });
@@ -102,6 +110,12 @@ export class ChatGateway
         'assistant',
         fullResponse,
       );
+
+      // Store user message embedding in background (don't await — non-blocking)
+      void this.embeddingService.storeEmbedding(userId, content, 'message', {
+        conversationId,
+        messageId: userMessage.id,
+      }, userMessage.id);
 
       client.emit('chat:complete', {
         requestId,

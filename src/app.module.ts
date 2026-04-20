@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { ChatModule } from './chat/chat.module';
 import { UploadModule } from './upload/upload.module';
+import { MemoryModule } from './memory/memory.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UploadModule } from './upload/upload.module';
     ConversationsModule,
     ChatModule,
     UploadModule,
+    MemoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

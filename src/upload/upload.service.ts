@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service';
 import { ChunkingService } from './chunking.service';
-import type { Database } from '../database/database.types';
-
-type MessageEmbedding = Database['public']['Tables']['message_embeddings']['Row'];
+import { EmbeddingService } from '../memory/embedding.service';
 
 export interface UploadResult {
   filename: string;
@@ -17,8 +14,8 @@ export class UploadService {
   private readonly logger = new Logger(UploadService.name);
 
   constructor(
-    private readonly db: DatabaseService,
     private readonly chunking: ChunkingService,
+    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async processDocument(
@@ -35,31 +32,28 @@ export class UploadService {
     const chunkIds: string[] = [];
 
     for (const chunk of chunks) {
-      const row = await this.db.queryOne<MessageEmbedding>(
-        `INSERT INTO message_embeddings
-           (user_id, content, source, metadata)
-         VALUES ($1, $2, 'document', $3)
-         RETURNING *`,
-        [
-          userId,
-          chunk.content,
-          JSON.stringify({
-            conversationId,
-            filename,
-            chunkIndex: chunk.index,
-            startChar: chunk.startChar,
-            endChar: chunk.endChar,
-          }),
-        ],
+      const metadata = {
+        conversationId,
+        filename,
+        chunkIndex: chunk.index,
+        startChar: chunk.startChar,
+        endChar: chunk.endChar,
+      };
+
+      // storeEmbedding handles graceful degradation (stores null embedding if API down)
+      const id = await this.embeddingService.storeEmbedding(
+        userId,
+        chunk.content,
+        'document',
+        metadata,
       );
 
-      if (row) chunkIds.push(row.id);
+      if (id) chunkIds.push(id);
     }
 
     this.logger.log(`Stored ${chunkIds.length} chunks for document "${filename}"`);
 
-    // Entity extraction runs as background pipeline (Phase 6)
-    // For now return empty extractedPeople — will be populated when extraction pipeline is wired
+    // Entity extraction runs as background pipeline (Phase 6 — LangGraph)
     return {
       filename,
       totalChunks: chunks.length,

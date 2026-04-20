@@ -44,6 +44,10 @@ class EnvironmentVariables {
   ANTHROPIC_API_KEY?: string;
 
   @IsString()
+  @IsOptional()
+  OPENAI_API_KEY?: string;
+
+  @IsString()
   EMBEDDING_MODEL!: string;
 
   @IsNumber()
