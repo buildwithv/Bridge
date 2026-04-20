@@ -4,7 +4,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUrl,
   Max,
   Min,
   validateSync,
@@ -27,14 +26,8 @@ class EnvironmentVariables {
   @IsOptional()
   PORT: number = 3000;
 
-  @IsUrl({ require_tld: false })
-  SUPABASE_URL!: string;
-
   @IsString()
-  SUPABASE_ANON_KEY!: string;
-
-  @IsString()
-  SUPABASE_SERVICE_ROLE_KEY!: string;
+  DATABASE_URL!: string;
 
   @IsString()
   LLM_PROVIDER!: string;
@@ -44,11 +37,11 @@ class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
-  ANTHROPIC_API_KEY?: string;
+  GROQ_API_KEY?: string;
 
   @IsString()
   @IsOptional()
-  OPENAI_API_KEY?: string;
+  ANTHROPIC_API_KEY?: string;
 
   @IsString()
   EMBEDDING_MODEL!: string;
