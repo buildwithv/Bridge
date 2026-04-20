@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OllamaEmbeddings } from '@langchain/ollama';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { Embeddings } from '@langchain/core/embeddings';
+import { CohereEmbeddings } from '@langchain/cohere';
+import type { Embeddings } from '@langchain/core/embeddings';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -15,17 +17,30 @@ export class EmbeddingService {
     private readonly config: ConfigService,
     private readonly db: DatabaseService,
   ) {
+    const provider = this.config.get<string>('EMBEDDING_PROVIDER', 'ollama');
     const model = this.config.getOrThrow<string>('EMBEDDING_MODEL');
-    this.dimensions = this.config.get<number>('EMBEDDING_DIMENSIONS', 1536);
+    this.dimensions = this.config.get<number>('EMBEDDING_DIMENSIONS', 768);
 
-    // OpenAI embeddings — free alternative: use nomic-embed via Ollama
-    this.embeddings = new OpenAIEmbeddings({
-      model,
-      apiKey: this.config.getOrThrow<string>('OPENAI_API_KEY'),
-      dimensions: this.dimensions,
-    });
+    if (provider === 'openai') {
+      this.embeddings = new OpenAIEmbeddings({
+        model,
+        apiKey: this.config.getOrThrow<string>('OPENAI_API_KEY'),
+        dimensions: this.dimensions,
+      });
+    } else if (provider === 'cohere') {
+      this.embeddings = new CohereEmbeddings({
+        model,
+        apiKey: this.config.getOrThrow<string>('COHERE_API_KEY'),
+      });
+    } else {
+      // Default: Ollama (free, local)
+      this.embeddings = new OllamaEmbeddings({
+        model,
+        baseUrl: this.config.get<string>('OLLAMA_BASE_URL', 'http://localhost:11434'),
+      });
+    }
 
-    this.logger.log(`Embedding service initialized model=${model} dims=${this.dimensions}`);
+    this.logger.log(`Embedding service initialized provider=${provider} model=${model} dims=${this.dimensions}`);
   }
 
   isAvailable(): boolean {
@@ -54,7 +69,6 @@ export class EmbeddingService {
   ): Promise<string | null> {
     const vector = await this.generateEmbedding(content);
 
-    // Store even without embedding (graceful degradation — embedding column stays null)
     const row = await this.db.queryOne<{ id: string }>(
       `INSERT INTO message_embeddings (user_id, content, embedding, source, metadata, message_id)
        VALUES ($1, $2, $3, $4, $5, $6)
