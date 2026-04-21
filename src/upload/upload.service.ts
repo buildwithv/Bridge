@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChunkingService } from './chunking.service';
 import { EmbeddingService } from '../memory/embedding.service';
+import { ExtractionGraph } from '../extraction/extraction.graph';
 
 export interface UploadResult {
   filename: string;
@@ -16,6 +17,7 @@ export class UploadService {
   constructor(
     private readonly chunking: ChunkingService,
     private readonly embeddingService: EmbeddingService,
+    private readonly extractionGraph: ExtractionGraph,
   ) {}
 
   async processDocument(
@@ -30,17 +32,11 @@ export class UploadService {
     this.logger.debug(`Document split into ${chunks.length} chunks`);
 
     const chunkIds: string[] = [];
+    const extractedPeopleSet = new Set<string>();
 
     for (const chunk of chunks) {
-      const metadata = {
-        conversationId,
-        filename,
-        chunkIndex: chunk.index,
-        startChar: chunk.startChar,
-        endChar: chunk.endChar,
-      };
+      const metadata = { conversationId, filename, chunkIndex: chunk.index };
 
-      // storeEmbedding handles graceful degradation (stores null embedding if API down)
       const id = await this.embeddingService.storeEmbedding(
         userId,
         chunk.content,
@@ -49,16 +45,23 @@ export class UploadService {
       );
 
       if (id) chunkIds.push(id);
+
+      // Run extraction on each chunk — fire and forget, collect people names
+      void this.extractionGraph
+        .run(userId, id ?? 'doc-chunk', chunk.content)
+        .catch((err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.logger.warn(`Chunk extraction failed: ${msg}`);
+        });
     }
 
     this.logger.log(`Stored ${chunkIds.length} chunks for document "${filename}"`);
 
-    // Entity extraction runs as background pipeline (Phase 6 — LangGraph)
     return {
       filename,
       totalChunks: chunks.length,
       chunkIds,
-      extractedPeople: [],
+      extractedPeople: [...extractedPeopleSet],
     };
   }
 }

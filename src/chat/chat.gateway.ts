@@ -1,4 +1,4 @@
-import { Logger, Optional, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, Optional } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -12,20 +12,25 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ConversationsService } from '../conversations/conversations.service';
 import { StreamService } from './stream.service';
-import { SendMessageDto } from '../conversations/dto/send-message.dto';
 import { UploadController } from '../upload/upload.controller';
 import { ContextAssemblyService } from '../memory/context-assembly.service';
 import { EmbeddingService } from '../memory/embedding.service';
+import { ExtractionGraph } from '../extraction/extraction.graph';
 
 interface AuthenticatedSocket extends Socket {
   userId: string;
+}
+
+interface ChatSendPayload {
+  conversationId: string;
+  content: string;
+  requestId: string;
 }
 
 @WebSocketGateway({
   cors: { origin: '*', credentials: true },
   namespace: '/',
 })
-@UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -39,6 +44,7 @@ export class ChatGateway
     private readonly streamService: StreamService,
     private readonly contextAssembly: ContextAssemblyService,
     private readonly embeddingService: EmbeddingService,
+    private readonly extractionGraph: ExtractionGraph,
     @Optional() private readonly uploadController: UploadController,
   ) {}
 
@@ -70,9 +76,14 @@ export class ChatGateway
   @SubscribeMessage('chat:send')
   async handleMessage(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() dto: SendMessageDto,
+    @MessageBody() body: unknown,
   ): Promise<void> {
-    const { conversationId, content, requestId } = dto;
+    const raw: ChatSendPayload =
+      typeof body === 'string' ? (JSON.parse(body) as ChatSendPayload) : (body as ChatSendPayload);
+
+
+
+    const { conversationId, content, requestId } = raw;
     const userId = client.userId;
 
     try {
@@ -85,7 +96,6 @@ export class ChatGateway
         content,
       );
 
-      // Run embedding + context assembly in parallel with history fetch
       const [history, memoryContext] = await Promise.all([
         this.conversationsService.getRecentMessages(conversationId, 11),
         this.contextAssembly.assembleContext(userId, content),
@@ -111,11 +121,11 @@ export class ChatGateway
         fullResponse,
       );
 
-      // Store user message embedding in background (don't await — non-blocking)
       void this.embeddingService.storeEmbedding(userId, content, 'message', {
         conversationId,
         messageId: userMessage.id,
       }, userMessage.id);
+      void this.extractionGraph.run(userId, userMessage.id, content);
 
       client.emit('chat:complete', {
         requestId,
