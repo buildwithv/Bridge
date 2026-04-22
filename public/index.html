@@ -667,9 +667,11 @@
 
       socket.on('chat:complete', () => {
         renderAiMsg(false);
-        aiMsgEl  = null;
-        aiText   = '';
-        streaming = false;
+        aiMsgEl    = null;
+        aiSpanEl   = null;
+        aiCursorEl = null;
+        aiText     = '';
+        streaming  = false;
         setSend(true);
       });
 
@@ -771,27 +773,29 @@
       scroll();
     }
 
+    let aiSpanEl   = null;
+    let aiCursorEl = null;
+
     function spawnAiMsg() {
       removeBubble('typing');
       const wrap = document.createElement('div');
       wrap.className = 'msg ai';
-      wrap.id = 'aiMsg';
       wrap.innerHTML = `
         <div class="msg-avatar">🧠</div>
         <div class="msg-body">
           <div class="msg-name">Shirin</div>
-          <div class="bubble"><span id="aiSpan"></span><span class="cursor" id="aiCursor"></span></div>
+          <div class="bubble"><span></span><span class="cursor"></span></div>
         </div>`;
       msgs().appendChild(wrap);
-      aiMsgEl = wrap;
+      aiMsgEl    = wrap;
+      aiSpanEl   = wrap.querySelector('.bubble span:first-child');
+      aiCursorEl = wrap.querySelector('.bubble .cursor');
       scroll();
     }
 
     function renderAiMsg(active) {
-      const span   = document.getElementById('aiSpan');
-      const cursor = document.getElementById('aiCursor');
-      if (span)   span.innerHTML   = esc(aiText);
-      if (cursor) cursor.style.display = active ? 'inline-block' : 'none';
+      if (aiSpanEl)   aiSpanEl.innerHTML            = esc(aiText);
+      if (aiCursorEl) aiCursorEl.style.display = active ? 'inline-block' : 'none';
       scroll();
     }
 
