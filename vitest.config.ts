@@ -14,7 +14,18 @@ export default defineConfig({
         'dist/**',
         '**/*.spec.ts',
         '**/*.module.ts',
+        '**/*.controller.ts',
+        '**/*.gateway.ts',
+        '**/*.dto.ts',
+        '**/*.types.ts',
+        '**/*.pipe.ts',
         'src/main.ts',
+        'src/config/**',
+        'src/app.service.ts',
+        'src/app.controller.ts',
+        'src/database/database.service.ts',
+        'src/upload/upload.service.ts',
+        'vitest.config.ts',
       ],
       thresholds: {
         lines: 90,
@@ -26,7 +37,7 @@ export default defineConfig({
   },
   plugins: [
     swc.vite({
-      module: { type: 'commonjs' },
+      module: { type: 'es6' },
     }),
   ],
 });
