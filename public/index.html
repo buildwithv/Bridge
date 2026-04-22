@@ -601,7 +601,7 @@
         ></textarea>
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="btn btn-ghost" onclick="triggerUpload()" title="Upload document">📎</button>
-          <button class="btn btn-send" id="sendBtn" onclick="send()" title="Send (Enter)">➤</button>
+          <button class="btn btn-send" id="sendBtn" onclick="send()" title="Send (Enter)" disabled>➤</button>
         </div>
       </div>
       <div class="input-footer">
@@ -628,20 +628,28 @@
     document.getElementById('userIdDisplay').textContent = USER_ID.slice(0, 18) + '…';
 
     // ── Bootstrap ────────────────────────────────────────────────────────────
-    (async () => {
+    async function init() {
       try {
-        const r = await fetch(`${SERVER}/api/conversations`, {
+        const r = await fetch(`${SERVER}/api/conversations?userId=${USER_ID}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: USER_ID, title: 'Know Me Demo' }),
+          body: JSON.stringify({ title: 'Know Me Demo' }),
         });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const d = await r.json();
         convId = d.id;
-      } catch {
-        toast('Server unreachable — run npm run start:dev', 'error');
+        setSend(true);
+      } catch (err) {
+        console.error('Failed to create conversation:', err);
+        toast('Could not create conversation — is the server running?', 'error');
+        setSend(false);
       }
       connectWS();
-    })();
+    }
+
+    // disable send until conversation is ready
+    setSend(false);
+    init();
 
     function connectWS() {
       setStatus('connecting');
@@ -677,7 +685,10 @@
     function send() {
       const el      = document.getElementById('input');
       const content = el.value.trim();
-      if (!content || streaming || !convId) return;
+      if (!content) return;
+      if (!convId)   { toast('Still connecting — please wait a moment', 'info'); return; }
+      if (streaming) return;
+      if (!socket || !socket.connected) { toast('Not connected to server', 'error'); return; }
 
       hideWelcome();
       appendUser(content);
@@ -722,7 +733,7 @@
       fd.append('file', file);
 
       try {
-        const r = await fetch(`${SERVER}/api/conversations/${convId}/upload`, { method: 'POST', body: fd });
+        const r = await fetch(`${SERVER}/api/conversations/${convId}/upload?userId=${USER_ID}`, { method: 'POST', body: fd });
         const d = await r.json();
 
         cardEl.querySelector('.file-status').textContent = `✓ ${d.totalChunks} chunks stored in memory`;
