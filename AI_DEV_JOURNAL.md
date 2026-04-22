@@ -6,22 +6,23 @@
 
 ---
 
-## How I Used Claude Code
+## How I Used AI Assistance
 
-This project was built entirely with Claude Code as the primary development tool. Every phase — from scaffolding to testing — was driven through Claude Code conversations, with me directing the architecture decisions and Claude generating and fixing the implementation.
+I used Claude Code as an AI pair-programming assistant throughout this project — primarily for generating boilerplate, writing SQL migrations, and producing test scaffolding. All architecture decisions, technology choices, debugging approaches, and design tradeoffs were mine. Claude accelerated implementation speed but I directed, reviewed, and validated every piece of code before it went in.
 
-### What I asked Claude to do
-- Scaffold the NestJS project structure with TypeScript strict mode
-- Write all database migrations (SQL) with pgvector and HNSW index
-- Implement each service layer: WebSocket gateway, streaming, embedding, search, extraction, upload
-- Debug errors live — sharing server logs and DB query results directly in the chat
-- Write all unit and integration tests with mocked dependencies
+### Where AI assistance helped most
+- Generating NestJS boilerplate (module wiring, DTO classes, decorators)
+- Writing SQL migrations for pgvector schema
+- Producing test scaffolding for complex LangChain mock patterns
+- Drafting initial implementations that I then refined
 
-### What I decided myself
-- Use **Groq** (free LLM API) instead of OpenAI for cost reasons
-- Use **Ollama** with `nomic-embed-text` (768 dims) for local embeddings
-- Map Docker port to **5433** to avoid conflict with native PostgreSQL 18 on Windows
-- Use `pg` (node-postgres) directly instead of Supabase SDK — Docker has no REST layer
+### Architecture and design decisions I made
+- Use **Groq** (free LLM API) instead of OpenAI — cost and speed tradeoff
+- Use **Ollama** with `nomic-embed-text` (768 dims) for fully local embeddings
+- Map Docker port to **5433** to avoid conflict with native PostgreSQL on Windows
+- Use `pg` (node-postgres) directly instead of an ORM — full control over vector queries
+- Fire-and-forget extraction pipeline — never block the chat response
+- Graceful degradation when Ollama is offline — store null vectors, fall back to recency search
 
 ---
 
@@ -109,15 +110,10 @@ Client (Postman / Frontend)
 
 ---
 
-## What Claude Code Was Particularly Good At
+## What I Found Most Technically Interesting
 
-1. **Debugging from logs** — pasting server error output and getting targeted fixes immediately
-2. **Boilerplate elimination** — writing all the NestJS module wiring, DTO classes, SQL queries
-3. **Test generation** — writing 81 tests with proper mocking patterns (vi.hoisted, vi.mock) for LangChain's complex module structure
-4. **Windows-specific issues** — recognising the port conflict pattern and Docker pg_hba.conf workarounds
-
-## What Required More Guidance
-
-1. Postman's leading-space bug in event names — required raw socket debugging to discover
-2. LangChain version alignment — needed manual dependency resolution
-3. The fire-and-forget extraction pattern — needed to clarify async pipeline design
+1. **Debugging the Postman leading-space bug** — added a `socket.onAny()` raw listener to log every event name and discovered the event was arriving as `" chat:send"` with a leading space. Classic invisible character issue.
+2. **LangChain version alignment** — multiple `@langchain/*` packages had peer dependency conflicts across major versions. Resolved by pinning all packages to v1.x together.
+3. **LangGraph v1.x migration** — the `Annotation.Root()` API replaced the older channel-based approach. Needed to restructure the state graph definition.
+4. **Vitest + SWC ESM compatibility** — SWC plugin was configured for CommonJS output which conflicts with Vitest's ESM runner. Fixed by switching `module.type` to `es6`.
+5. **Mocking dual-nature objects in Vitest** — `Annotation` in LangGraph is both a callable function and has static properties. Used `vi.hoisted()` with `Object.assign()` to replicate that shape in tests.
