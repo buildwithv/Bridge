@@ -1,7 +1,7 @@
 # Bridge Project 
 
 **Tool Required:** Claude Code (primary development tool)
-**Submission:** GitHub repository link + Loom walkthrough (15-20 min)
+
 
 ---
 
